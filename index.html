@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLR Prompt Architect & Workspace - COIL Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 1); }
+        .tab-active { border-bottom-color: #3b82f6; color: #2563eb; }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.75rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+    <div class="max-w-7xl mx-auto w-full px-4 py-6 md:py-8 flex-grow flex flex-col">
+        <header class="mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="bg-blue-600 text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded tracking-wider">Academic Pro</span>
+                    <span class="text-slate-400">|</span>
+                    <span class="text-xs text-slate-500 font-medium">Equipped with Gemini 3.1 Flash</span>
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">SLR Prompt Architect & Workspace</h1>
+                <p class="text-slate-500 text-sm mt-0.5">Define, refine, and execute AI-based title/abstract screening on your literature CSVs using the COIL Framework.</p>
+            </div>
+            
+            <!-- API Key & Action Center -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="relative min-w-[240px]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <input type="password" id="geminiApiKey" placeholder="Gemini API Key (Auto-injected)" class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm" title="Leave blank to use pre-configured developer API Key context if available.">
+                </div>
+                <button onclick="resetAllFields()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-red-500 transition-all shadow-sm flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    Reset Form
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-200 mb-6 gap-2">
+            <button onclick="switchTab('promptBuilderTab')" id="btn-promptBuilderTab" class="px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                1. Prompt Builder
+            </button>
+            <button onclick="switchTab('aiRefinerTab')" id="btn-aiRefinerTab" class="px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all flex items-center gap-2 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                2. AI Criteria Generator
+                <span class="absolute top-1 right-0 w-2 h-2 rounded-full bg-blue-500"></span>
+            </button>
+            <button onclick="switchTab('csvScreenerTab')" id="btn-csvScreenerTab" class="px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                3. Live AI CSV Screener
+            </button>
+        </div>
+
+        <!-- Custom Toast/Message Box -->
+        <div id="toast" class="hidden fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border transition-all duration-300">
+            <div id="toastIcon"></div>
+            <div class="text-sm font-medium" id="toastMessage"></div>
+        </div>
+
+        <!-- Tab 1: Prompt Builder Content -->
+        <div id="promptBuilderTab" class="tab-content grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
+            <!-- Left Configurator -->
+            <section class="space-y-6">
+                <div class="glass-panel p-6 rounded-2xl shadow-md border-slate-200">
+                    <h2 class="text-base font-bold mb-4 flex items-center gap-2 text-slate-800 border-b border-slate-100 pb-3">
+                        <div class="bg-blue-600 text-white p-1 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </div>
+                        COIL Parameters Definition
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Project Title</label>
+                                <input type="text" id="projectTitle" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium" value="AI & Geopolitical Supply Chain Risk">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Your Persona (Role)</label>
+                                <select id="role" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium">
+                                    <option value="Senior Research Associate">Senior Research Associate</option>
+                                    <option value="Principal Investigator">Principal Investigator</option>
+                                    <option value="PhD Candidate">PhD Candidate</option>
+                                    <option value="Data Scientist">Data Scientist</option>
+                                    <option value="Subject Matter Expert">Subject Matter Expert</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Expertise Level</label>
+                                <select id="expertise" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium">
+                                    <option value="highly rigorous and technical">Highly Rigorous & Technical</option>
+                                    <option value="balanced and critical">Balanced & Critical</option>
+                                    <option value="exploratory and broad">Exploratory & Broad</option>
+                                    <option value="strict compliance-focused">Strict Compliance-Focused</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Screening Stage</label>
+                                <select id="stage" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium">
+                                    <option value="Title and Abstract screening only">Title & Abstract Screening</option>
+                                    <option value="Full-Text Eligibility review">Full-Text Eligibility Review</option>
+                                    <option value="Initial Keyword filtering">Initial Keyword Filtering</option>
+                                    <option value="Data Extraction and Synthesis">Data Extraction / Synthesis</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Research Objective (CORE QUESTION)</label>
+                            <textarea id="objective" rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm leading-relaxed" placeholder="What is the primary question?">How can AI technologies be leveraged to mitigate or manage geopolitical risks that lead to supply chain disruptions?</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-emerald-600 mb-1.5">Inclusion Criteria (One per line)</label>
+                                <textarea id="inclusion" rows="4" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-xs font-medium leading-relaxed" placeholder="List criteria...">- Focus on Supply Chain/Logistics
+- Mentions specific AI/ML models
+- Discusses geopolitical factors</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-rose-600 mb-1.5">Exclusion Criteria (One per line)</label>
+                                <textarea id="exclusion" rows="4" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all text-xs font-medium leading-relaxed" placeholder="List criteria...">- Natural disasters only
+- General AI overview
+- Non-research articles</textarea>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Output Detail Level</label>
+                            <select id="detail" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm font-medium">
+                                <option value="detailed one-sentence reasoning for every decision">Detailed (Reason for every row)</option>
+                                <option value="concise labels only with reasons for exclusions only">Concise (Reasons for Exclusions only)</option>
+                                <option value="comprehensive analysis including certainty scores and potential tags">Comprehensive (Analysis + Certainty Scores)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Preview Panel -->
+            <section class="flex flex-col h-full min-h-[500px]">
+                <div class="glass-panel flex-grow rounded-2xl shadow-md overflow-hidden flex flex-col border border-slate-200">
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h2 class="text-xs font-bold uppercase tracking-widest text-slate-500">Live COIL Prompt Preview</h2>
+                        </div>
+                        <button onclick="copyPromptToClipboard()" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                            Copy Prompt
+                        </button>
+                    </div>
+                    <div class="flex-grow p-5 overflow-y-auto bg-slate-900 text-slate-200 font-mono text-xs leading-relaxed max-h-[480px]">
+                        <pre id="promptOutput" class="whitespace-pre-wrap"></pre>
+                    </div>
+                    <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-start gap-3">
+                        <div class="text-blue-500 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-medium leading-normal">
+                            This generated prompt can be copied and dropped directly into <strong class="text-slate-700">NotebookLM</strong>, <strong class="text-slate-700">ChatGPT</strong>, or <strong class="text-slate-700">Claude</strong> alongside your data source, or executed instantly in Tab 3.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 2: AI Criteria Refiner Content -->
+        <div id="aiRefinerTab" class="tab-content hidden flex-grow grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Parameter inputs for AI Refiner -->
+            <section class="space-y-6">
+                <div class="glass-panel p-6 rounded-2xl shadow-md border-slate-200">
+                    <h2 class="text-base font-bold mb-4 flex items-center gap-2 text-slate-800 border-b border-slate-100 pb-3">
+                        <div class="bg-indigo-600 text-white p-1 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.096-.813L9 9l.813 5.096L15 15l-5.187.904z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.071 4.929l-.707 3.535-3.535.707.707 3.535 3.535-.707-.707-3.535z" /></svg>
+                        </div>
+                        Criteria Generator Consultant
+                    </h2>
+                    
+                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                        Struggling to draft highly specific, unambiguous inclusion/exclusion criteria? Tell Gemini your primary research topic or raw idea, and let the LLM construct academic-grade criteria for you based on systematic guidelines.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Raw Research Goal or Core Question</label>
+                            <textarea id="rawConcept" rows="3" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm leading-relaxed" placeholder="Type or paste your raw research interest here... e.g. 'I want to study how retail companies utilize AI algorithms to manage disruptions in deliveries caused by international border blocks.'"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Focus/Scope Level</label>
+                            <select id="refinerRigour" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm font-medium">
+                                <option value="balanced">Balanced & Highly Rigorous</option>
+                                <option value="inclusive">Broad & Inclusive (Exploratory focus)</option>
+                                <option value="exclusive">Extremely Strict (High Precision focus)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generateCriteriaWithAI()" id="btnGenerateCriteria" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 mt-2">
+                            <span id="aiRefinerLoader" class="hidden animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                            <span id="aiRefinerBtnText">Optimize Criteria with Gemini</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Refiner Output -->
+            <section class="flex flex-col h-full min-h-[500px]">
+                <div class="glass-panel flex-grow rounded-2xl shadow-md overflow-hidden flex flex-col border border-slate-200">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-slate-500">Gemini's Recommendations</h2>
+                        <span id="refineSuccessBadge" class="hidden bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full">Populated Prompt Form!</span>
+                    </div>
+                    <div class="flex-grow p-6 overflow-y-auto bg-white flex flex-col justify-center items-center text-center space-y-4" id="refinerEmptyState">
+                        <div class="text-slate-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h0a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-700">No Recommended Criteria Yet</h3>
+                            <p class="text-xs text-slate-400 max-w-sm mt-1 mx-auto">Fill in the raw research objective on the left and query the Gemini assistant to build robust, precise criteria.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-grow p-6 overflow-y-auto hidden space-y-4" id="refinerOutputState">
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Generated Title Recommendation</h4>
+                            <p id="refinerRecTitle" class="text-sm font-semibold text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-100"></p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Optimized Objective Question</h4>
+                            <p id="refinerRecObj" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 italic"></p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1">Refined Inclusion Criteria</h4>
+                                <div id="refinerRecInc" class="text-xs bg-emerald-50/50 text-slate-700 p-3 rounded-lg border border-emerald-100 whitespace-pre-line leading-relaxed"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600 mb-1">Refined Exclusion Criteria</h4>
+                                <div id="refinerRecExc" class="text-xs bg-rose-50/50 text-slate-700 p-3 rounded-lg border border-rose-100 whitespace-pre-line leading-relaxed"></div>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
+                            <button onclick="applyRefinedCriteriaToForm()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                                Sync & Apply to Prompt Builder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 3: Live CSV Screener Content -->
+        <div id="csvScreenerTab" class="tab-content hidden flex-grow flex flex-col gap-6">
+            <!-- Top Controls Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- CSV Upload Panel -->
+                <div class="glass-panel p-5 rounded-2xl shadow-sm border-slate-200">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        Upload CSV Literature Source
+                    </h3>
+                    <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center bg-slate-50 hover:bg-slate-100/50 transition-colors relative cursor-pointer" id="dropzone">
+                        <input type="file" id="csvFileInput" accept=".csv" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleFileSelect(event)">
+                        <div class="text-slate-400 mb-1" id="uploadStateIcon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </div>
+                        <p class="text-xs font-bold text-slate-700" id="uploadStateTitle">Click or drag metadata CSV</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5" id="uploadStateDesc">Supports typical export formats (Scopus, WoS, PubMed)</p>
+                    </div>
+                </div>
+
+                <!-- Column Mapping Panel -->
+                <div class="glass-panel p-5 rounded-2xl shadow-sm border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                            Map Data Columns
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Title Column</label>
+                                <select id="mapTitle" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium" disabled>
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Abstract Column</label>
+                                <select id="mapAbstract" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium" disabled>
+                                    <option value="">Select column...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Execution Settings -->
+                <div class="glass-panel p-5 rounded-2xl shadow-sm border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                            Execution Config
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Batch Size (Papers)</label>
+                                <select id="batchSize" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium">
+                                    <option value="5">5 papers</option>
+                                    <option value="10" selected>10 papers</option>
+                                    <option value="20">20 papers</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Total Limit</label>
+                                <select id="limitCount" class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium">
+                                    <option value="10" selected>First 10 papers</option>
+                                    <option value="20">First 20 papers</option>
+                                    <option value="50">First 50 papers</option>
+                                    <option value="all">Full Document</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="startScreener()" id="btnStartScreener" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 text-xs" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /></svg>
+                        Run screening with Gemini
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Results Grid (Will toggle view dynamically) -->
+            <div class="glass-panel rounded-2xl shadow-md border-slate-200 flex-grow flex flex-col overflow-hidden min-h-[400px]">
+                <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span id="screenStatusBadge" class="h-2 w-2 rounded-full bg-slate-300"></span>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500" id="screeningStatusLabel">Awaiting literature dataset...</h4>
+                    </div>
+                    
+                    <!-- Quick Filters -->
+                    <div class="flex items-center gap-2 text-xs">
+                        <button onclick="filterResults('all')" id="filter-all" class="bg-blue-500 text-white font-semibold px-2.5 py-1 rounded-lg">All (<span id="count-all">0</span>)</button>
+                        <button onclick="filterResults('include')" id="filter-include" class="bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-lg hover:bg-slate-200 transition-colors">Include (<span id="count-include">0</span>)</button>
+                        <button onclick="filterResults('exclude')" id="filter-exclude" class="bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-lg hover:bg-slate-200 transition-colors">Exclude (<span id="count-exclude">0</span>)</button>
+                        <button onclick="filterResults('pending')" id="filter-pending" class="bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-lg hover:bg-slate-200 transition-colors">Pending (<span id="count-pending">0</span>)</button>
+                        <button onclick="exportCSVResults()" class="border border-slate-200 bg-white text-slate-600 font-bold px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-slate-800 transition-all flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            Export Results (.csv)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Screening Table Wrapper -->
+                <div class="flex-grow overflow-x-auto overflow-y-auto max-h-[480px]">
+                    <table class="w-full text-left text-xs text-slate-600 border-collapse">
+                        <thead class="bg-slate-50/70 border-b border-slate-100 sticky top-0 backdrop-blur-md">
+                            <tr>
+                                <th class="p-3 font-semibold text-slate-500 text-[10px] uppercase tracking-wider w-[50px]">No.</th>
+                                <th class="p-3 font-semibold text-slate-500 text-[10px] uppercase tracking-wider w-[350px]">Title</th>
+                                <th class="p-3 font-semibold text-slate-500 text-[10px] uppercase tracking-wider w-[120px]">Decision</th>
+                                <th class="p-3 font-semibold text-slate-500 text-[10px] uppercase tracking-wider">Primary Rationale for Decision</th>
+                                <th class="p-3 font-semibold text-slate-500 text-[10px] uppercase tracking-wider w-[100px]">Certainty (1-5)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screenerTableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- Empty State inside the screening table -->
+                            <tr id="screenerEmptyRow">
+                                <td colspan="5" class="p-12 text-center text-slate-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto stroke-current mb-2" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    <span class="font-bold text-slate-600">No paper metadata loaded yet.</span>
+                                    <p class="text-[11px] text-slate-400 mt-1">Please upload a valid research paper CSV above to parse and run AI screening.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Core state architecture
+        let currentTab = 'promptBuilderTab';
+        let parsedCSVRows = [];
+        let screenResults = [];
+        let activeFilter = 'all';
+
+        // SLR Prompt parameters config element lists
+        const configInputs = ['projectTitle', 'role', 'expertise', 'stage', 'objective', 'inclusion', 'exclusion', 'detail'];
+
+        // Automatically bind live template generation listeners on window load
+        window.addEventListener('load', () => {
+            configInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', generateCOILPromptText);
+                    el.addEventListener('change', generateCOILPromptText);
+                }
+            });
+            generateCOILPromptText();
+        });
+
+        // Tab selection logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Adjust buttons active styling
+            document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+                btn.className = "px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all flex items-center gap-2";
+            });
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "px-4 py-2.5 text-sm font-bold border-b-2 border-blue-600 text-blue-600 transition-all flex items-center gap-2";
+            }
+            currentTab = tabId;
+        }
+
+        // Generate standard COIL prompt
+        function generateCOILPromptText() {
+            const vals = {};
+            configInputs.forEach(id => {
+                const el = document.getElementById(id);
+                vals[id] = el ? el.value : '';
+            });
+
+            const template = `# Prompt: ${vals.projectTitle} - SLR Screening
+
+## 1. Context (CONTEXT)
+Act as a ${vals.role} with a ${vals.expertise} mindset. You are tasked with performing a ${vals.stage} of literature on this domain.
+
+## 2. Research Objective (OBJECTIVE)
+The primary research question is: "${vals.objective}"
+
+## 3. Screening Instructions (INSTRUCTIONS)
+Analyze the 'title' and 'abstract' columns of the provided literature data. Apply the following criteria strictly:
+
+### INCLUSION CRITERIA:
+${vals.inclusion.split('\n').filter(l => l.trim()).map(line => `${line.trim()}`).join('\n')}
+
+### EXCLUSION CRITERIA:
+${vals.exclusion.split('\n').filter(l => l.trim()).map(line => `${line.trim()}`).join('\n')}
+
+## 4. Operational Boundaries (LIMITATIONS)
+- Decision Logic: If a paper does not explicitly mention the core concepts, it must be excluded.
+- Borderline Cases: Mark as **[PENDING]** for human validation.
+- Output Detail: Provide ${vals.detail}.
+- No Assumptions: Do not infer data that is not present in the columns.
+
+## 5. Output Format
+Present the screening results in a clean Markdown table with the following format (ensure your JSON output or markdown matches this EXACT format so our interface parser can successfully read it):
+
+| No. | Title | Decision (Include/Exclude/Pending) | Primary Reason | Certainty (1-5) |
+| :--- | :--- | :--- | :--- | :--- |
+
+Make sure you output only valid choices for the Decision column: "Include", "Exclude", or "Pending". Do not output markdown descriptions outside this table.`;
+
+            const promptOutputEl = document.getElementById('promptOutput');
+            if (promptOutputEl) {
+                promptOutputEl.textContent = template;
+            }
+            return template;
+        }
+
+        // Helper: Exponential Backoff Fetch
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    if (response.status === 429 && retries > 0) {
+                        await new Promise(res => setTimeout(res, delay));
+                        return fetchWithRetry(url, options, retries - 1, delay * 2);
+                    }
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(res => setTimeout(res, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        }
+
+        // Helper: Fetch User API Key or Default Pre-config context
+        function getApiKey() {
+            const val = document.getElementById('geminiApiKey').value.trim();
+            return val ? val : ""; // Rely on dynamically injected canvas key if empty
+        }
+
+        // Display beautiful toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            toastMessage.textContent = message;
+            toast.className = "fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border transition-all duration-300 transform translate-y-0 opacity-100";
+            
+            if (type === 'success') {
+                toast.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+                toastIcon.innerHTML = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+            } else if (type === 'error') {
+                toast.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-800');
+                toastIcon.innerHTML = `<svg class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+            } else {
+                toast.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-800');
+                toastIcon.innerHTML = `<svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+            }
+            
+            setTimeout(() => {
+                toast.className = "hidden";
+            }, 3000);
+        }
+
+        // Call Gemini using Structured Outputs (JSON Schema) to configure academic criteria
+        async function generateCriteriaWithAI() {
+            const rawConcept = document.getElementById('rawConcept').value.trim();
+            if (!rawConcept) {
+                showToast("Please enter a raw research concept first", "error");
+                return;
+            }
+
+            const btnText = document.getElementById('aiRefinerBtnText');
+            const loader = document.getElementById('aiRefinerLoader');
+            const btn = document.getElementById('btnGenerateCriteria');
+
+            btnText.textContent = "Analyzing & Synthesizing...";
+            loader.classList.remove('hidden');
+            btn.disabled = true;
+
+            const systemPrompt = "You are a senior academic advisor and world-class expert in Systematic Literature Reviews. Analyze the raw concept or keywords provided and build a structured, precise set of Inclusion and Exclusion Criteria following standard research guidelines (e.g., PICO/PRISMA frameworks). Formulate rigorous, clear criteria to ensure literature screening results are highly precise and reproducible.";
+            const userPrompt = `Develop criteria for this concept: "${rawConcept}". Adjust rigor based on focus level: "${document.getElementById('refinerRigour').value}". Output appropriate lists.`;
+
+            const apiKey = getApiKey();
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            projectTitle: { type: "STRING", description: "A concise academic project title" },
+                            objectiveQuestion: { type: "STRING", description: "The core optimized research question" },
+                            inclusionCriteria: { type: "ARRAY", items: { type: "STRING" }, description: "Clear bullet points specifying what is included" },
+                            exclusionCriteria: { type: "ARRAY", items: { type: "STRING" }, description: "Clear bullet points specifying what is excluded" }
+                        },
+                        required: ["projectTitle", "objectiveQuestion", "inclusionCriteria", "exclusionCriteria"],
+                        propertyOrdering: ["projectTitle", "objectiveQuestion", "inclusionCriteria", "exclusionCriteria"]
+                    }
+                }
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                const contentText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!contentText) {
+                    throw new Error("Empty response returned from the model");
+                }
+
+                const result = JSON.parse(contentText);
+                
+                // Populate Recommendation Panel elements
+                document.getElementById('refinerRecTitle').textContent = result.projectTitle || "Research Topic";
+                document.getElementById('refinerRecObj').textContent = result.objectiveQuestion || "Objective Goal";
+                
+                const incFormatted = (result.inclusionCriteria || []).map(c => `- ${c}`).join('\n');
+                const excFormatted = (result.exclusionCriteria || []).map(c => `- ${c}`).join('\n');
+                
+                document.getElementById('refinerRecInc').innerText = incFormatted;
+                document.getElementById('refinerRecExc').innerText = excFormatted;
+
+                // Cache the variables directly on recommendation state
+                window.lastAIRefinedResult = {
+                    projectTitle: result.projectTitle,
+                    objectiveQuestion: result.objectiveQuestion,
+                    inclusion: incFormatted,
+                    exclusion: excFormatted
+                };
+
+                // Swap states to view recomendations
+                document.getElementById('refinerEmptyState').classList.add('hidden');
+                document.getElementById('refinerOutputState').classList.remove('hidden');
+                showToast("Refined criteria built successfully!", "success");
+
+            } catch (err) {
+                console.error(err);
+                showToast(`Failed to consult AI: ${err.message}`, "error");
+            } finally {
+                btnText.textContent = "Optimize Criteria with Gemini";
+                loader.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+
+        // Sync recommended criteria directly to the input form
+        function applyRefinedCriteriaToForm() {
+            if (!window.lastAIRefinedResult) return;
+
+            document.getElementById('projectTitle').value = window.lastAIRefinedResult.projectTitle;
+            document.getElementById('objective').value = window.lastAIRefinedResult.objectiveQuestion;
+            document.getElementById('inclusion').value = window.lastAIRefinedResult.inclusion;
+            document.getElementById('exclusion').value = window.lastAIRefinedResult.exclusion;
+
+            // Regenerate standard preview
+            generateCOILPromptText();
+
+            // Notify user
+            const badge = document.getElementById('refineSuccessBadge');
+            badge.classList.remove('hidden');
+            showToast("Prompt Builder form synchronized!", "success");
+            setTimeout(() => badge.classList.add('hidden'), 3000);
+        }
+
+        // CSV Parsing functions without external dependencies
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseCSVText(text);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSVText(text) {
+            const lines = [];
+            let row = [""];
+            let inQuotes = false;
+
+            // Highly performant CSV parser that respects commas within quotes
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                const next = text[i+1];
+                if (c === '"') {
+                    if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; } // double quote logic
+                    else { inQuotes = !inQuotes; }
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') {
+                lines.push(row);
+            }
+
+            if (lines.length < 2) {
+                showToast("The CSV appears to have no headers or rows.", "error");
+                return;
+            }
+
+            const headers = lines[0].map(h => h.trim());
+            parsedCSVRows = [];
+
+            // Convert raw arrays to indexed objects based on headers
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].length !== headers.length) continue; // ignore malformed rows
+                const rowObj = {};
+                headers.forEach((h, idx) => {
+                    rowObj[h] = lines[i][idx];
+                });
+                parsedCSVRows.push(rowObj);
+            }
+
+            updateDropdownColumns(headers);
+            updateUploadStatus(headers.length, parsedCSVRows.length);
+        }
+
+        function updateDropdownColumns(headers) {
+            const titleSel = document.getElementById('mapTitle');
+            const absSel = document.getElementById('mapAbstract');
+
+            // Reset current
+            titleSel.innerHTML = '<option value="">Select column...</option>';
+            absSel.innerHTML = '<option value="">Select column...</option>';
+
+            headers.forEach(h => {
+                const optT = document.createElement('option');
+                optT.value = h; optT.textContent = h;
+                titleSel.appendChild(optT);
+
+                const optA = document.createElement('option');
+                optA.value = h; optA.textContent = h;
+                absSel.appendChild(optA);
+            });
+
+            // Auto-detect standard fields
+            const selectIfMatch = (element, candidates) => {
+                for (let cand of candidates) {
+                    const matched = headers.find(h => h.toLowerCase() === cand.toLowerCase());
+                    if (matched) {
+                        element.value = matched;
+                        break;
+                    }
+                }
+            };
+
+            selectIfMatch(titleSel, ['title', 'paper title', 'document title', 'article title']);
+            selectIfMatch(absSel, ['abstract', 'summary', 'paper abstract']);
+
+            titleSel.disabled = false;
+            absSel.disabled = false;
+            document.getElementById('btnStartScreener').disabled = false;
+        }
+
+        function updateUploadStatus(headerCount, rowCount) {
+            const title = document.getElementById('uploadStateTitle');
+            const desc = document.getElementById('uploadStateDesc');
+            const icon = document.getElementById('uploadStateIcon');
+
+            title.textContent = `Metadata CSV Loaded`;
+            desc.innerHTML = `<span class="text-emerald-600 font-bold">${rowCount}</span> records parsed with ${headerCount} fields.`;
+            icon.innerHTML = `<svg class="h-8 w-8 text-emerald-500 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            
+            document.getElementById('screeningStatusLabel').textContent = `${rowCount} rows ready to process`;
+            showToast(`Parsed ${rowCount} papers successfully!`, "success");
+        }
+
+        // Execute the screening sequence utilizing Gemini
+        async function startScreener() {
+            const titleField = document.getElementById('mapTitle').value;
+            const abstractField = document.getElementById('mapAbstract').value;
+
+            if (!titleField || !abstractField) {
+                showToast("Please complete the Title and Abstract column mappings", "error");
+                return;
+            }
+
+            const totalLimitVal = document.getElementById('limitCount').value;
+            const batchSize = parseInt(document.getElementById('batchSize').value, 10);
+            const totalToProcess = totalLimitVal === 'all' ? parsedCSVRows.length : Math.min(parseInt(totalLimitVal, 10), parsedCSVRows.length);
+
+            if (totalToProcess === 0) {
+                showToast("No records available to process in the parsed dataset", "error");
+                return;
+            }
+
+            const btn = document.getElementById('btnStartScreener');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent mr-1"></span> Screening with Gemini...`;
+
+            // Reset Screening Data
+            screenResults = [];
+            updateScreenerTable();
+
+            document.getElementById('screeningStatusLabel').textContent = `Processing 0 / ${totalToProcess} papers...`;
+            const statusBadge = document.getElementById('screenStatusBadge');
+            statusBadge.className = "h-2 w-2 rounded-full bg-blue-500 animate-pulse";
+
+            const corePrompt = generateCOILPromptText();
+            const apiKey = getApiKey();
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            // Process papers in manageable batches
+            for (let startIdx = 0; startIdx < totalToProcess; startIdx += batchSize) {
+                const endIdx = Math.min(startIdx + batchSize, totalToProcess);
+                const batchRows = parsedCSVRows.slice(startIdx, endIdx);
+                
+                // Format batch data concisely for context
+                const batchPromptData = batchRows.map((row, i) => {
+                    return `Row ID: ${startIdx + i + 1}\nTitle: ${row[titleField] || 'N/A'}\nAbstract: ${row[abstractField] || 'N/A'}`;
+                }).join('\n\n---\n\n');
+
+                const systemInstruction = "You are a professional research paper filtering bot. Map each provided paper to either 'Include', 'Exclude', or 'Pending'. Return raw data strictly formatted in the requested JSON structure only.";
+
+                const queryInstruction = `
+Apply these systematic literature review criteria to filter the following papers:
+${corePrompt}
+
+---
+PAPERS TO SCREEN:
+${batchPromptData}
+
+---
+Return your response STRICTLY as a JSON Array with the structure:
+[
+  {
+    "rowId": 1,
+    "title": "Exact Title of Paper",
+    "decision": "Include" | "Exclude" | "Pending",
+    "reason": "One sentence reasoning for decision referencing specific criteria",
+    "certainty": 4
+  }
+]
+No extra conversational explanations. Return purely the formatted JSON.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: queryInstruction }] }],
+                    systemInstruction: { parts: [{ text: systemInstruction }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    rowId: { type: "NUMBER" },
+                                    title: { type: "STRING" },
+                                    decision: { type: "STRING", enum: ["Include", "Exclude", "Pending"] },
+                                    reason: { type: "STRING" },
+                                    certainty: { type: "NUMBER" }
+                                },
+                                required: ["rowId", "title", "decision", "reason", "certainty"]
+                            }
+                        }
+                    }
+                };
+
+                try {
+                    const response = await fetchWithRetry(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+                    const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!textResult) throw new Error("No payload parsed back from Gemini");
+
+                    const parsedBatchRes = JSON.parse(textResult);
+
+                    // Add items to cumulative result list
+                    parsedBatchRes.forEach(item => {
+                        screenResults.push({
+                            index: item.rowId,
+                            title: item.title,
+                            decision: item.decision,
+                            reason: item.reason,
+                            certainty: item.certainty
+                        });
+                    });
+
+                    document.getElementById('screeningStatusLabel').textContent = `Screened ${endIdx} / ${totalToProcess} papers...`;
+                    updateScreenerTable();
+
+                } catch (batchErr) {
+                    console.error("Batch processing error: ", batchErr);
+                    showToast(`Error in batch starting at row ${startIdx + 1}: ${batchErr.message}`, "error");
+                    
+                    // Populate failures gracefully as Pending so execution does not break completely
+                    batchRows.forEach((row, i) => {
+                        screenResults.push({
+                            index: startIdx + i + 1,
+                            title: row[titleField] || "Unparseable row",
+                            decision: "Pending",
+                            reason: `Error: Gemini API Batch screening failed for this row (${batchErr.message}).`,
+                            certainty: 1
+                        });
+                    });
+                    updateScreenerTable();
+                }
+            }
+
+            statusBadge.className = "h-2 w-2 rounded-full bg-emerald-500";
+            document.getElementById('screeningStatusLabel').textContent = `Completed screening of ${totalToProcess} papers!`;
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            showToast("Gemini screening task complete!", "success");
+        }
+
+        // Render the processed data dynamically with filters and styling
+        function updateScreenerTable() {
+            const tbody = document.getElementById('screenerTableBody');
+            tbody.innerHTML = '';
+
+            if (screenResults.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `
+                    <td colspan="5" class="p-12 text-center text-slate-400">
+                        <svg class="animate-spin rounded-full h-8 w-8 text-blue-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" /></svg>
+                        <span class="font-bold text-slate-700">Gemini Screener is running...</span>
+                        <p class="text-[11px] text-slate-400 mt-1">Applying COIL instructions to your literature collection.</p>
+                    </td>`;
+                tbody.appendChild(emptyRow);
+                return;
+            }
+
+            // Calculate totals
+            let countAll = screenResults.length;
+            let countInc = screenResults.filter(r => r.decision.toLowerCase() === 'include').length;
+            let countExc = screenResults.filter(r => r.decision.toLowerCase() === 'exclude').length;
+            let countPen = screenResults.filter(r => r.decision.toLowerCase() === 'pending').length;
+
+            document.getElementById('count-all').textContent = countAll;
+            document.getElementById('count-include').textContent = countInc;
+            document.getElementById('count-exclude').textContent = countExc;
+            document.getElementById('count-pending').textContent = countPen;
+
+            // Apply filter selection
+            const filtered = screenResults.filter(item => {
+                if (activeFilter === 'all') return true;
+                return item.decision.toLowerCase() === activeFilter;
+            });
+
+            if (filtered.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `<td colspan="5" class="p-8 text-center text-slate-400">No papers matched the active filter selection "${activeFilter}"</td>`;
+                tbody.appendChild(emptyRow);
+                return;
+            }
+
+            filtered.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/50 transition-colors";
+
+                let badgeClass = "bg-slate-100 text-slate-700";
+                if (item.decision.toLowerCase() === 'include') badgeClass = "bg-emerald-100 text-emerald-800 font-semibold";
+                else if (item.decision.toLowerCase() === 'exclude') badgeClass = "bg-rose-100 text-rose-800 font-semibold";
+                else if (item.decision.toLowerCase() === 'pending') badgeClass = "bg-amber-100 text-amber-800 font-semibold";
+
+                row.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-500">${item.index}</td>
+                    <td class="p-3 font-medium text-slate-900 pr-4">${item.title}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] tracking-wide uppercase ${badgeClass}">${item.decision}</span>
+                    </td>
+                    <td class="p-3 text-slate-600 leading-relaxed pr-6">${item.reason}</td>
+                    <td class="p-3 text-slate-700">
+                        <div class="flex items-center gap-1 font-semibold">
+                            <span class="text-blue-600">${item.certainty}</span>
+                            <span class="text-slate-300">/ 5</span>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Toggle Quick Filters
+        function filterResults(filterType) {
+            activeFilter = filterType;
+            
+            // Adjust buttons state colors
+            const buttons = ['all', 'include', 'exclude', 'pending'];
+            buttons.forEach(b => {
+                const btn = document.getElementById(`filter-${b}`);
+                if (b === filterType) {
+                    btn.className = "bg-blue-600 text-white font-semibold px-2.5 py-1 rounded-lg shadow-sm";
+                } else {
+                    btn.className = "bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-lg hover:bg-slate-200 transition-colors";
+                }
+            });
+
+            updateScreenerTable();
+        }
+
+        // Export parsed results as a standard clean CSV File
+        function exportCSVResults() {
+            if (screenResults.length === 0) {
+                showToast("No screening output data is present to export", "error");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Index,Title,Decision,Primary Reason,Certainty Score\n";
+
+            screenResults.forEach(item => {
+                const titleEsc = `"${(item.title || '').replace(/"/g, '""')}"`;
+                const reasonEsc = `"${(item.reason || '').replace(/"/g, '""')}"`;
+                csvContent += `${item.index},${titleEsc},${item.decision},${reasonEsc},${item.certainty}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `SLR_Screening_Results_${document.getElementById('projectTitle').value.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Result CSV saved successfully!", "success");
+        }
+
+        // Helper: Reset form state values
+        function resetAllFields() {
+            const promptBuilderFormInputs = ['projectTitle', 'role', 'expertise', 'stage', 'objective', 'inclusion', 'exclusion', 'detail'];
+            promptBuilderFormInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                    else el.value = '';
+                }
+            });
+            parsedCSVRows = [];
+            screenResults = [];
+            
+            document.getElementById('mapTitle').disabled = true;
+            document.getElementById('mapAbstract').disabled = true;
+            document.getElementById('btnStartScreener').disabled = true;
+
+            // Reset upload interface styles
+            const title = document.getElementById('uploadStateTitle');
+            const desc = document.getElementById('uploadStateDesc');
+            const icon = document.getElementById('uploadStateIcon');
+            title.textContent = `Click or drag metadata CSV`;
+            desc.textContent = `Supports typical export formats (Scopus, WoS, PubMed)`;
+            icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`;
+
+            updateScreenerTable();
+            generateCOILPromptText();
+            showToast("Workspace inputs cleared", "success");
+        }
+
+        // Helper: Copy Prompt String to Clipboard
+        function copyPromptToClipboard() {
+            const promptText = document.getElementById('promptOutput').textContent;
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = promptText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("COIL Master Prompt copied to clipboard!", "success");
+            } catch (err) {
+                console.error('Failed to copy', err);
+                showToast("Failed to copy prompt to clipboard.", "error");
+            }
+            document.body.removeChild(tempTextArea);
+        }
+    </script>
+</body>
+</html>
